@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import CoinTable from "./components/CoinTable";
 
 function App() {
+
+    const [loading, setLoading] = useState(true);
+    const [coins, setCoins] = useState([]);
+
+    const refresh = () => {
+        window.location.reload();
+    }
+
+    useEffect(() => {
+        fetch("/v1/tickers")
+            .then(response => response.json())
+            .then(json => {
+                setCoins(json.slice(0, 100));
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <div>
+            <button onClick={refresh}>새로고침</button>
+        </div>
+        <div>
+            <CoinTable coins={coins}/>
+        </div>
     </div>
   );
 }
